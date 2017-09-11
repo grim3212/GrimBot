@@ -1,0 +1,2 @@
+# GrimBot
+Basic Discord bot
