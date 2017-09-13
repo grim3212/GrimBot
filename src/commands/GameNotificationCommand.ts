@@ -20,7 +20,8 @@ export default class GameNotificationAddCommand extends Command {
       'lookup                  : Display notifications for a specific game\u000d'+
       'stats                   : Stats about all game notifications\u000d\u000d'+
       '*When creating the message you may use <game> and <user> and they will be replaced when the message is written.\u000d'+
-      '*Most Arguments will walk you through the setup so you only need to follow the instructions.'
+      '*Most Arguments will walk you through the setup so you only need to follow the instructions.',
+      guildOnly: true
     });
   }
 
