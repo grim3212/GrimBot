@@ -1,6 +1,6 @@
 import { Command, Message, Middleware, CommandDecorators } from 'yamdbf';
 import { Collection } from 'discord.js';
-import Util from '../util/Util';
+import Util from '../../util/Util';
 
 const { resolve, expect } = Middleware;
 const { using } = CommandDecorators;
