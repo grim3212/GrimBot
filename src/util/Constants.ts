@@ -7,6 +7,7 @@ export type GrimBotConstants = {
   waitTimeName: string;
   useWaitTimeName: string;
   showNotificationName: string;
+  channelName: string;
 };
 
 const Constants: GrimBotConstants = <any>{};
@@ -19,5 +20,6 @@ Constants.lastNotificationName = 'LastNotifications';
 Constants.showNotificationName = Constants.keyName + '.showGameNotifications';
 Constants.useWaitTimeName = Constants.keyName + '.useWaitTime';
 Constants.waitTimeName = Constants.keyName + '.waitTime';
+Constants.channelName = Constants.keyName + '.channel';
 
 export default Constants;

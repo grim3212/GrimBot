@@ -1,5 +1,5 @@
 import { Command, Message, GuildStorage, GuildSettings, KeyedStorage, Util as YUtil } from 'yamdbf';
-import { Collection, RichEmbed, Permissions } from 'discord.js';
+import { Collection, RichEmbed, Permissions, TextChannel } from 'discord.js';
 import Constants from '../util/Constants';
 import Util from '../util/Util';
 
@@ -10,7 +10,17 @@ export default class GameNotificationAddCommand extends Command {
       desc: 'Use this to add a Game Notification for when a user starts a certain game.',
       usage: '<prefix>gn <Argument>',
       info: 'Argument information below...\u000d\u000d' +
-      'When creating the message you may use <game> and <user> and they will be replaced when the message is written.'
+      '*add                    : Adds a new notification for a game\u000d' +
+      'on/off                  : Enable/disable game notifications\u000d'+
+      'useWaitTime <true/false>: Enable/disable cool down for notifications\u000d'+
+      'setWaitTime             : If use wait time is active then this is the amount in ms until a user can be sent another notification\u000d'+
+      'setChannel              : Set game notification channel\u000d'+
+      'clear <-a (clear all)>  : Clear a games notifications. If admin and you add -a, this will remove all game notifications\u000d'+
+      'remove                  : Remove a notification for a game\u000d'+
+      'lookup                  : Display notifications for a specific game\u000d'+
+      'stats                   : Stats about all game notifications\u000d\u000d'+
+      '*When creating the message you may use <game> and <user> and they will be replaced when the message is written.\u000d'+
+      '*Most Arguments will walk you through the setup so you only need to follow the instructions.'
     });
   }
 
@@ -117,19 +127,42 @@ export default class GameNotificationAddCommand extends Command {
         } else {
           return message.reply(`Use wait time is now turned off!`);
         }
-      case 'clear':
-        //Add argument for clearing everything
+      case 'off':
+        //Turn off game notifications
+        await guildSettings.set(Constants.showNotificationName, false);
 
+        return message.reply(`Game Notifications have been turned off!`);
+      case 'on':
+        //Turn on game notifications
+        await guildSettings.set(Constants.showNotificationName, true);
+
+        return message.reply(`Game Notifications have been turned on!`);
+      case 'setChannel':
         // let the user know we're working
         message.channel.startTyping();
 
-        if(args[1]&&args[1]==='-a'){
+        //Only allow the channel to be a text channel
+        if (message.channel.type === 'text') {
+          await guildSettings.set(Constants.channelName, message.channel.id);
+          message.reply(`Game Notification channel set as '${(<TextChannel>message.channel).name}' with id '${message.channel.id}'.`);
+        } else {
+          message.reply(`Game Notification channel cannot be set to a DM channel.`);
+        }
 
-          if(message.member.permissions.has(new Array(Permissions.FLAGS.ADMINISTRATOR, Permissions.FLAGS.MANAGE_GUILD))){
+        return message.channel.stopTyping();
+      case 'clear':
+        // let the user know we're working
+        message.channel.startTyping();
+
+        //Argument for wiping all notifications
+        if (args[1] && args[1] === '-a') {
+
+          //Only to be used by admins
+          if (message.member.permissions.has(new Array(Permissions.FLAGS.ADMINISTRATOR, Permissions.FLAGS.MANAGE_GUILD))) {
             await guildStorage.remove(Constants.keyName);
 
             message.reply("Cleared all game notifications!! :(");
-          }else{
+          } else {
             message.reply("You do not have permission to use the '-a' arg!");
           }
           return message.channel.stopTyping();
@@ -312,7 +345,7 @@ export default class GameNotificationAddCommand extends Command {
                   }
 
                   //Print out using a RichEmbed
-                  message.reply("Type the number of the notification to remove...", {
+                  message.reply("Type the number of the notification to remove... (-c to cancel)", {
                     embed: {
                       "author": {
                         "name": this.client.user.username,
